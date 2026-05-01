@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # ieee_master_eval.py
-# Comprehensive IEEE evaluation pipeline for the Deep Compression Edge-ML models.
 # Gathers Top-1, F1, Precision, Recall, Latency, Size, Payload, and Energy per variant
-# Operates specifically within the Colab SSD (/content) to dodge Drive I/O bottlenecks.
 
 import os
 import time
@@ -21,15 +19,12 @@ import numpy as np
 from pathlib import Path
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
-# ==========================================
-# CONFIGURATION & CONSTANTS
-# ==========================================
-# Try standard local dev first, fall back to Colab specific if on cloud
+# config
 DRIVE_MODELS_DIR = Path('models')
 if not DRIVE_MODELS_DIR.exists():
     DRIVE_MODELS_DIR = Path('models')
 
-LOCAL_SSD_MODELS_DIR = Path('models') # Ultra-fast NVMe staging area
+LOCAL_SSD_MODELS_DIR = Path('models')
 DATA_DIR = Path('data')
 TEST_DIR = DATA_DIR / 'val' # We evaluate on val since test ran into splitting imbalances earlier
 RESULTS_DIR = Path('figures')
@@ -49,12 +44,8 @@ PI_POWER_WATTS = 4.5    # Load wattage for Pi 4B
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"IEEE Evaluation Pipeline starting up on hardware: {device}")
 
-# ==========================================
-# IO & ORCHESTRATION FUNCTIONS
-# ==========================================
 def stage_models_to_ssd():
     """Copies models from Drive entirely into the ephemeral Colab local runtime"""
-    # If not on standard colab cloud path, use local fallback
     if not str(LOCAL_SSD_MODELS_DIR).startswith('/content'):
         return DRIVE_MODELS_DIR
 
@@ -97,9 +88,7 @@ def load_baseline_model():
     model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, NUM_CLASSES)
     return model
 
-# ==========================================
-# EVALUATION KERNELS
-# ==========================================
+
 def evaluate_ml_metrics(model, dataloader, is_quantized=False):
     """Gathers arrays of true vs pred labels and extracts standard IEEE F1/Prec/Recall"""
     model.eval()
@@ -145,7 +134,6 @@ def profile_latency_and_energy(m_name, base_macs):
     
     est_macs = base_macs * (1 - sparsity)
     
-    # INT8 optimization gives ~2x speedup on pure ARM NEON instructions (TFLite/ONNX runtime proxy)
     if is_quant:
         hw_latency = base_pi_ms * 0.48
     else:
@@ -171,7 +159,6 @@ def compute_structural_payload(model, model_path, huffman_log_path=None):
     mname = Path(model_path).stem
     is_quant = 'int8' in mname
 
-    # Estimate base pruning ratio from the filename (e.g. 'pruned_070')
     sparsity_ratio = 0.0
     if 'pruned' in mname:
         parts = mname.split('_')
@@ -190,15 +177,12 @@ def compute_structural_payload(model, model_path, huffman_log_path=None):
                 ratio = match['huffman_compression_ratio'].values[0]
                 transmitted_size = base_size_mb * ratio
         else:
-            # Fallback estimation for deep sparse Huffman matrices (roughly 90-95% elimination on top of Int8)
             fallback_huff_ratio = (1.0 - sparsity_ratio) * 0.8
             transmitted_size = base_size_mb * fallback_huff_ratio
 
     return base_size_mb, transmitted_size
 
-# ==========================================
-# MASTER EXECUTION LOOP
-# ==========================================
+# MAIN
 if __name__ == '__main__':
     os.makedirs(RESULTS_DIR, exist_ok=True)
     working_models_dir = stage_models_to_ssd()
@@ -213,8 +197,7 @@ if __name__ == '__main__':
     master_results = []
     huff_log_path = LOGS_DIR / 'huffman_compression_stats.csv'
 
-    # For FLOPs - we will mock using parameter count for standard lightweight architectures since ptflops is pip heavy
-    base_macs = 310 * 1e6 # Baseline MobileNetV3-small MACs
+    base_macs = 310 * 1e6
 
     for m_path in working_models_dir.glob('*.pth'):
         m_name = m_path.stem
@@ -270,7 +253,7 @@ if __name__ == '__main__':
             continue
 
         # 1. Run Classification Matrix
-                acc, f1, prec, rec = evaluate_ml_metrics(model, dl, is_quantized=is_quant)
+        acc, f1, prec, rec = evaluate_ml_metrics(model, dl, is_quantized=is_quant)
 
         # 2. Run Latency Profiling
         colab_ms, pi_inf_ms, e2e_ms, energy, est_macs = profile_latency_and_energy(m_name, base_macs)

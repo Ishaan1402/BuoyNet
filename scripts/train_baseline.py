@@ -24,10 +24,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
 # Hyperparams
-NUM_CLASSES = 6 # Example: PET, HDPE, LDPE, PP, PS, PVC
+NUM_CLASSES = 6
 BATCH_SIZE = 32
 LR = 1e-4
-EPOCHS = 10 # 10 for quick testing, scale to 50 for final
+EPOCHS = 10
 
 # Data pipeline
 train_transform = transforms.Compose([
@@ -103,7 +103,6 @@ if __name__ == '__main__':
     train_path = DATA_DIR / 'train'
     val_path = DATA_DIR / 'val'
 
-    # Check if real dataset exists
     EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp'}
     train_count = sum(1 for p in train_path.rglob('*') if p.is_file() and p.suffix.lower() in EXTENSIONS)
 

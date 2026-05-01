@@ -51,7 +51,7 @@ def load_baseline_model():
     return model
 
 def generate_confusion_matrix():
-    """Generates an IEEE-formatted Confusion Matrix for the Baseline model to show class confusion."""
+    """Generates a Confusion Matrix for the Baseline model to show class confusion."""
     print("Generating Confusion Matrix for Baseline FP32 Model...")
 
     classes = ["BOTTLE", "BUTT", "CAP", "CUTLERY", "EEL_TRAP", "FACEMASK", "FILM", "FOAM", "HARD", "LINE", "NOISE", "PELLET", "SPACER", "STRAW", "TOOTHBRUSH", "WRAPPER"]
@@ -115,7 +115,7 @@ def generate_layer_sparsity_breakdown():
     sparsity_levels = []
     total_params_list = []
 
-    # We aggregate blocks of layers to make the chart readable
+    # aggregate blocks of layers
     current_block_name = ""
     block_zeros = 0
     block_total = 0
@@ -181,7 +181,6 @@ def generate_layer_sparsity_breakdown():
     ax2.tick_params(axis='y', labelcolor=color)
     ax2.set_yscale('log')
 
-    # Clean up legend
     lines, labels = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax2.legend(lines + lines2, labels + labels2, loc='upper left')
@@ -193,7 +192,7 @@ def generate_layer_sparsity_breakdown():
     out_path = RESULTS_DIR / 'layer_sparsity_profile.png'
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    plt.close(fig) # ensure the root figure is also cleaned
+    plt.close(fig)
     print(f"Saved Layer Sparsity Breakdown to {out_path}")
 
 def generate_compression_waterfall():
@@ -206,7 +205,6 @@ def generate_compression_waterfall():
         huff_df = pd.read_csv(Path('logs') / 'huffman_compression_stats.csv')
 
         # 2. Extract specific milestones
-        # Ensure dataframe checks handle differing potential model names robustly
         fp32_row = lat_df[lat_df['model_name'].str.contains('baseline_fp32')]
         int8_row = lat_df[lat_df['model_name'].str.contains('baseline_int8_ptq')]
 
@@ -225,21 +223,21 @@ def generate_compression_waterfall():
             # so INT8 size * Huffman Ratio represents the actual payload size transmitted.
             final_payload_size = int8_size * ratio
         else:
-            final_payload_size = int8_size * 0.36 # fallback estimation
+            final_payload_size = int8_size * 0.36
 
         stages = ['1. Baseline (FP32)', '2. Quantized (INT8)', '3. Deep Compressed\n(INT8 + 70% Pruned\n+ Huffman)']
         sizes = [fp32_size, int8_size, final_payload_size]
 
         plt.figure(figsize=(10, 6))
 
-        # Create a waterfall/step bar chart
+        # Create a waterfall chart
         bars = plt.bar(stages, sizes, color=['#c0392b', '#2980b9', '#27ae60'], edgecolor='black', zorder=3)
 
         plt.ylabel('IoT Transmission Payload Size (MB)', fontweight='bold')
         plt.title('Figure 6: Deep Compression Stage Reduction Waterfall', pad=20, fontweight='bold')
         plt.grid(axis='y', linestyle='--', alpha=0.7, zorder=0)
 
-        # Annotate exact sizes and X-times compression
+        # Annotate sizes and compression
         for i, bar in enumerate(bars):
             height = bar.get_height()
             plt.annotate(f"{height:.2f} MB",
@@ -270,7 +268,6 @@ def generate_class_degradation_comparison():
     def get_per_class_acc(model_name, is_quant=False):
         if not TEST_DIR.exists(): return None
         model = mobilenet_v3_small(weights=None)
-        # CRITICAL: We must dynamically map the linear classifier to the number of classes actually in testing
         model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_detected_classes)
 
         if is_quant:
@@ -309,7 +306,7 @@ def generate_class_degradation_comparison():
     x = np.arange(len(classes))
     width = 0.35
 
-    # Safely duplicate arrays to match x-axis in plot
+    # duplicate arrays to match x-axis in plot
     if len(acc_fp32) > len(classes):
         acc_fp32 = acc_fp32[:len(classes)]
     if len(acc_compressed) > len(classes):
@@ -338,7 +335,7 @@ def generate_class_degradation_comparison():
     print(f"Saved Class Degradation Chart to {out_path}")
 
 def generate_huffman_weight_distribution():
-    """Generates a histogram of quantized weights showing the massive spike at 0 due to 70% pruning."""
+    """Generates a histogram of quantized weights """
     print("Generating Huffman Weight Distribution Histogram...")
 
     m_path = MODELS_DIR / 'baseline_int8_pruned_70.pth'
