@@ -1,12 +1,12 @@
 # BuoyNet
 
-Microscopic marine plastic debris classification using **MobileNetV3-Small**, with Deep Compression (quantization / pruning / weight coding), profiling (accuracy, latency/size/energy proxies), and **synthetic domain shift** tests in order to mimic turbid water, biofouling, and poor lighting.
+Classifying marine microplastic debris using **MobileNetV3-Small**, with Deep Compression (quantization / pruning / weight coding), profiling (accuracy, latency/size/energy proxies), and **synthetic domain shift** tests in order to mimic turbid water, biofouling, and poor lighting.
 
 **Paper:** [BuoyNet (PDF)](reference/BuoyNet.pdf)
 
 ---
 
-## Elevator Pitch
+## SparkNotes
 
 - **Problem:** Classify drifting plastic fragments from buoy-mounted imagery where models must stay small and fast enough for edge hardware.
 - **Approach:** MobileNetV3‑Small, trained on ImageNet, fine-tuned on a multi-class debris [dataset](https://figshare.com/articles/dataset/DeepParticle_dataset_MICRO_MESO_MACRO_2022_/26511253); compressed with quantization-aware training (INT8), L1 unstructured pruning on conv/linear weights, plus Huffman weight encoding ([compression](scripts/compression_pipeline.py)).
@@ -40,12 +40,10 @@ Stack: Python, PyTorch, torchvision, OpenCV, scikit-learn, pandas/matplotlib.
 
 ## Notes
 
-Direct answers to questions I had while building this—and ones reviewers usually raise.
-
 1. **No field deployment.** BuoyNet was never mounted on a buoy or run in open water. All results come from offline training, compression, and scripted evaluation. The goal is a design study at the intersection of IoT hardware and software. Given a pretrained backbone and dataset, which compressed variants can stay accurate enough, and which seem viable on paper for edge hardware?
 2. **Domain shift is a proxy for real-world underwater conditions.** [augment_domain_shift.py](scripts/augment_domain_shift.py) applies blur, color cast, and lighting tweaks to approximate turbidity, biofouling, and poor illumination. Those transforms stress the model in a controlled way and expose relative drops between FP32 and compressed checkpoints but they do **not** fully validate performance on real underwater footage. The shifted splits are a  **check on the robustness of the model**, not evidence that BuoyNet can seamlessly generalize in the field.
 3. **PTQ deprecated for QAT.** Early experiments used post-training quantization in [compression_pipeline.py](scripts/compression_pipeline.py) (`quantize_dynamic` → `baseline_int8_ptq.pth`) as a quick baseline. Accuracy loss was too high for the paper’s targets, so the main pipeline moved to **quantization-aware training** ([BuoyNet_QAT_Pipeline.ipynb](notebooks/BuoyNet_QAT_Pipeline.ipynb) → `qat_int8_baseline.pth`). The PTQ script stays in the repo as an ablation path; the paper's numbers and Pareto labels are derived from the QAT variants.
-4. **Reproducibility limits.** Notebooks were run on Colab with manual steps. Re-running end-to-end requires the DeepParticle dataset and GPUs for QAT.
+4. **Reproducing.** Notebooks were run on Colab with manual steps. Re-running end-to-end requires the DeepParticle dataset and GPUs for QAT.
 
 ---
 
