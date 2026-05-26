@@ -24,7 +24,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
 # Hyperparams
-NUM_CLASSES = 6
+NUM_CLASSES = 16
 BATCH_SIZE = 32
 LR = 1e-4
 EPOCHS = 10
