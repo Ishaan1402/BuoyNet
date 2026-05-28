@@ -28,16 +28,16 @@ Stack: Python, PyTorch, torchvision, OpenCV, scikit-learn, pandas, matplotlib.
 ## Results
 
 
-| Variant                    | Top-1 Acc | Payload Size | Size vs. FP32 | E2E Latency (Simulated) | Energy / Inference (Simulated) |
-| -------------------------- | --------- | ------------ | ------------- | ----------------------- | ------------------------------ |
-| **FP32 Baseline**          | 98.91%    | 5.98 MB      | —             | 370.40 ms               | 0.2043 J                       |
-| **QAT INT8**               | 96.10%    | 4.24 MB      | -29.1%        | 346.79 ms               | 0.0981 J                       |
-| **QAT INT8 + Pruning 30%** | 95.10%    | 3.04 MB      | -49.2%        | 342.54 ms               | 0.0789 J                       |
-| **QAT INT8 + Pruning 50%** | 93.60%    | 2.28 MB      | -61.9%        | 339.71 ms               | 0.0662 J                       |
-| **QAT INT8 + Pruning 70%** | 91.60%    | 1.52 MB      | -74.6%        | 336.88 ms               | 0.0534 J                       |
+| Variant                    | Top-1 Acc | Payload Size | Size vs. FP32 |
+| -------------------------- | --------- | ------------ | ------------- |
+| **FP32 Baseline**          | 98.91%    | 5.98 MB      | —             |
+| **QAT INT8**               | 96.10%    | 4.24 MB      | -29.1%        |
+| **QAT INT8 + Pruning 30%** | 95.10%    | 3.04 MB      | -49.2%        |
+| **QAT INT8 + Pruning 50%** | 93.60%    | 2.28 MB      | -61.9%        |
+| **QAT INT8 + Pruning 70%** | 91.60%    | 1.52 MB      | -74.6%        |
 
 
-*Table 1: The compression–accuracy Pareto frontier shows how Deep Compression integrates quantization, pruning, and entropy coding to meet IoT edge hardware constraints (Raspberry Pi 4B). Payload sizes reflect the Compressed Sparse Row (CSR) formatted and Huffman entropy-coded footprint.*
+*Table 1: The compression–accuracy Pareto frontier shows how Deep Compression integrates quantization, pruning, and entropy coding to reduce model size. Payload sizes reflect the Compressed Sparse Row (CSR) formatted and Huffman entropy-coded footprint.*
 
 ### Visualizations
 
