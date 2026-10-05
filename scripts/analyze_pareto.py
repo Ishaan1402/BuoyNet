@@ -41,7 +41,7 @@ def build_pareto_plots(df):
         'model_name': ['FP32 Baseline', 'Pruned 30%', 'Pruned 50%', 'Pruned 70%',
                        'QAT INT8', 'QAT INT8 + Pruned 30%', 'QAT INT8 + Pruned 50%', 'QAT INT8 + Pruned 70%'],
         'pi_e2e_latency_ms': [370.40, 361.55, 355.64, 349.74, 346.79, 342.54, 339.71, 336.88],
-        'estimated_size_mb': [5.98, 5.94, 5.94, 5.94, 4.24, 4.24, 2.28, 1.52], # Payload sizes
+        'estimated_size_mb': [6.0, 6.0, 6.0, 6.0, 4.3, 4.3, 4.3, 4.3], # Measured on-disk checkpoint sizes
         'accuracy': [98.91, 96.60, 95.10, 93.10, 96.10, 95.10, 93.60, 91.60]
     })
 
