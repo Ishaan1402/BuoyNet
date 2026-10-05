@@ -6,7 +6,7 @@
 [![Max Compression](https://img.shields.io/badge/Max%20Compression--74.6%25-brightgreen?style=flat)](#results)
 [![INT8 Accuracy](https://img.shields.io/badge/INT8%20Accuracy-91.60%25-blue?style=flat)](#results)
 [![Paper PDF](https://img.shields.io/badge/Paper-PDF-orange?style=flat&logo=adobe-acrobat-reader&logoColor=white)](reference/BuoyNet.pdf)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Classifying marine microplastic debris using **MobileNetV3-Small**, with Deep Compression (quantization / pruning / huffman encoding). BuoyNet benchmarks accuracy, models latency, size, energy, and applies **synthetic domain shift** to the held-out test set in order to evaluate robustness under simulated water conditions (turbid water, biofouling, and poor lighting).
 
