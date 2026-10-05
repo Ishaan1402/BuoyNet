@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Target HW](https://img.shields.io/badge/Target%20HW-Raspberry%20Pi%204B-red?style=flat&logo=raspberrypi&logoColor=white)](https://www.raspberrypi.com/)
-[![Max Compression](https://img.shields.io/badge/Max%20Compression--74.6%25-brightgreen?style=flat)](#results)
+[![Max Compression](https://img.shields.io/badge/Max%20Compression--29%25-brightgreen?style=flat)](#results)
 [![INT8 Accuracy](https://img.shields.io/badge/INT8%20Accuracy-91.60%25-blue?style=flat)](#results)
 [![Paper PDF](https://img.shields.io/badge/Paper-PDF-orange?style=flat&logo=adobe-acrobat-reader&logoColor=white)](reference/BuoyNet.pdf)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -28,16 +28,20 @@ Stack: Python, PyTorch, torchvision, OpenCV, scikit-learn, pandas, matplotlib.
 ## Results
 
 
-| Variant                    | Top-1 Acc | Payload Size | Size vs. FP32 |
-| -------------------------- | --------- | ------------ | ------------- |
-| **FP32 Baseline**          | 98.91%    | 5.98 MB      | —             |
-| **QAT INT8**               | 96.10%    | 4.24 MB      | -29.1%        |
-| **QAT INT8 + Pruning 30%** | 95.10%    | 3.04 MB      | -49.2%        |
-| **QAT INT8 + Pruning 50%** | 93.60%    | 2.28 MB      | -61.9%        |
-| **QAT INT8 + Pruning 70%** | 91.60%    | 1.52 MB      | -74.6%        |
+| Variant                    | Top-1 Acc | File Size | Size vs. FP32 |
+| -------------------------- | --------- | --------- | ------------- |
+| **FP32 Baseline**          | 98.91%    | 6.0 MB    | —             |
+| **FP32 + Pruning 30%**     | 96.60%    | 6.0 MB    | 0%            |
+| **FP32 + Pruning 50%**     | 95.10%    | 6.0 MB    | 0%            |
+| **FP32 + Pruning 70%**     | 93.10%    | 6.0 MB    | 0%            |
+| **QAT INT8**               | 96.10%    | 4.3 MB    | -29%          |
+| **QAT INT8 + Pruning 30%** | 95.10%    | 4.3 MB    | -29%          |
+| **QAT INT8 + Pruning 50%** | 93.60%    | 4.3 MB    | -29%          |
+| **QAT INT8 + Pruning 70%** | 91.60%    | 4.3 MB    | -29%          |
 
+**Correction:** The paper's payload sizes (1.52/2.28/3.04 MB, 74.6% compression) were computed by scaling a classifier-only Huffman ratio to the full model. The measured file sizes are as listed above. Unstructured pruning eliminates operations but does not reduce stored checkpoint size; INT8 quantization reduces on-disk size by ~29%.
 
-*Table 1: The compression–accuracy Pareto frontier shows how Deep Compression integrates quantization, pruning, and entropy coding to reduce model size. Payload sizes reflect the Compressed Sparse Row (CSR) formatted and Huffman entropy-coded footprint.*
+*Table 1: The compression–accuracy Pareto frontier shows how quantization and pruning affect model size and accuracy. File sizes reflect measured on-disk checkpoint sizes.*
 
 ### Visualizations
 
@@ -47,7 +51,7 @@ Stack: Python, PyTorch, torchvision, OpenCV, scikit-learn, pandas, matplotlib.
 
 ![Accuracy vs. estimated payload size](figures/pareto_accuracy_vs_size.png)
 
-*Figure 2: Accuracy vs CSR + Huffman payload size.*
+*Figure 2: Accuracy vs measured on-disk checkpoint size.*
 
 ![Per-class accuracy under compression](figures/class_degradation_comparison.png)
 
